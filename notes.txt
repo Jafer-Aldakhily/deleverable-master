@@ -1,0 +1,5 @@
+Darken the layaout background color, shadow on side bar menu, 
+active category in sidebar profile icon in side bar sticky radius in search bar. 
+favoraite section , something to serve users ex. pay to be in top five search results. 
+hub to link the users and the photographers to provide his service take pic for thier food, 
+add some effects to the pic, editing modification. skills and services section in personal page  page
