@@ -20,5 +20,6 @@ So firstly you need to visit our site and logged in, then you will show the imag
 
 [Visit a github repo](https://github.com/Jafer-Aldakhily/deleverable-master)<br>
 [Click here to see wireframe ande mockup](https://www.figma.com/file/bhfmo2WwNPbAe50dtahoXH/Camertac?node-id=0%3A1&t=2GpWXD9xE9BbEW8o-0)<br>
-[Trello Link](https://trello.com/b/6Cd1rYSn/masterpice)
+[Trello Link](https://trello.com/b/6Cd1rYSn/masterpice)<br>
+[Documentation Link] (https://docs.google.com/document/d/1gR9mfrmscDiFsdSCsU43mzyB630uvOEiLtSqa30nHN8/edit)
 
