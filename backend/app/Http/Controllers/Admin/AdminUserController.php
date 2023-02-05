@@ -6,6 +6,7 @@ use App\Models\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class AdminUserController extends Controller
 {
@@ -16,7 +17,7 @@ class AdminUserController extends Controller
      */
     public function index()
     {
-        $admins = Admin::latest()->get();
+        $admins = Admin::latest()->paginate(3);
         return view('users.index', compact('admins'));
     }
 
@@ -65,6 +66,9 @@ class AdminUserController extends Controller
         $admin->admin_image = $image_file_name;
         $admin->admin_type = $request->admin_type;
         $admin->save();
+
+        Session::push('success', 'Added admin successfully');
+        Session::save();
 
         return redirect('/admin/users');
     }
@@ -131,6 +135,8 @@ class AdminUserController extends Controller
             $admin->admin_type = $request->admin_type;
             $admin->save();
 
+            Session::push('success', 'Update admin successfully');
+            Session::save();
             return redirect('/admin/users');
         } else {
             $admin->first_name = $request->first_name;
@@ -139,6 +145,8 @@ class AdminUserController extends Controller
             $admin->admin_type = $request->admin_type;
             $admin->save();
 
+            Session::push('success', 'Update admin successfully');
+            Session::save();
             return redirect('/admin/users');
         }
     }
@@ -156,5 +164,6 @@ class AdminUserController extends Controller
         unlink($oldImagePath);
         $admin->delete();
         return redirect('/admin/users');
+        Session::flash('success', 'Delete admin successfully');
     }
 }

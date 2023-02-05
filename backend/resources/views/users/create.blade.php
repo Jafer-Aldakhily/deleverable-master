@@ -65,11 +65,13 @@
                                 </div>
                             </div>
 
+                            <input type="hidden" name="admin_type" value="super_admin">
+
                             {{-- third row --}}
-                            <div class="row">
-                                <div class="col-12">
+                            {{-- <div class="row">
+                                <div class="col-12"> --}}
                                     {{-- admin_type --}}
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label for="admin_type">Admin type</label>
                                         <select name="admin_type"  class="form-control">
                                             <option>Select type</option>
@@ -81,7 +83,7 @@
                                               @enderror
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
 
 
 

@@ -13,6 +13,7 @@ import { LoginSocialFacebook } from "reactjs-social-login";
 import jwt_decode from "jwt-decode";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
+import Swal from "sweetalert2";
 
 // facebook Id = 1318792195582496
 export default function Login() {
@@ -29,6 +30,22 @@ export default function Login() {
     axios.post("/api/login", data).then((response) => {
       const token = response.data.token;
       localStorage.setItem("token", token);
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener("mouseenter", Swal.stopTimer);
+          toast.addEventListener("mouseleave", Swal.resumeTimer);
+        },
+      });
+
+      Toast.fire({
+        icon: "success",
+        title: "Welcome back",
+      });
       navigate("/");
     });
   };
@@ -103,13 +120,13 @@ export default function Login() {
 
       <div className="absolute flex flex-col justify-center items-center top-0 right-0 left-0 bottom-0 bg-blackOverlay">
         <div className="">
-          <div className="p-5">
+          <div className="p-1">
             <img src={logo} width="130px" alt="logo" />
           </div>
 
           <div className="pb-5 flex flex-col justify-center items-start">
             <div className="mb-2  text-white ">
-              <Label htmlFor="email4" value="Your email" />
+              {/* <Label htmlFor="email4" value="Your email" /> */}
             </div>
             <TextInput
               id="email4"
@@ -121,7 +138,7 @@ export default function Login() {
               onChange={(e) => setEmail(e.target.value)}
             />
             <div className="mb-2  text-white">
-              <Label htmlFor="password" value="Your password" />
+              {/* <Label htmlFor="password" value="Your password" /> */}
             </div>
             <TextInput
               id="password"
@@ -173,6 +190,13 @@ export default function Login() {
           </div>
           <Link to="/register" className="text-white hover:cursor-pointer">
             Create account !
+          </Link>
+          <br />
+          <Link
+            to="/forget/password"
+            className="text-white hover:cursor-pointer"
+          >
+            Forget Password !
           </Link>
         </div>
       </div>

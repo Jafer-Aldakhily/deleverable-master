@@ -7,3 +7,15 @@
     </div>
 </footer>
 <!-- End of Footer -->
+
+
+<script>
+    @if(Session::has("success"))
+    toastr.options =
+    {
+        "closeButton" : true,
+        "progressBar" : true
+    }
+            toastr.success("Successfully");
+    @endif
+  </script>

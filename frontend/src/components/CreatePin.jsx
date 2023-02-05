@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
-import { AiOutlineCloudUpload } from 'react-icons/ai';
-import { useNavigate } from 'react-router-dom';
-import { MdDelete } from 'react-icons/md';
+import React, { useState } from "react";
+import { AiOutlineCloudUpload } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
+import { MdDelete } from "react-icons/md";
 
-import categories from '../utils/data';
+import categories from "../utils/data";
 // import { client } from '../client';
-import Spinner from './Spinner';
-import useImage from '../assets/0018.jpg'
+import Spinner from "./Spinner";
+import useImage from "../assets/0018.jpg";
+import { useEffect } from "react";
+import axios from "axios";
+import swal from "sweetalert";
 
 const CreatePin = ({ user }) => {
-  const [title, setTitle] = useState('');
-  const [about, setAbout] = useState('');
+  const [title, setTitle] = useState("");
+  const [about, setAbout] = useState("");
   const [loading, setLoading] = useState(false);
   const [destination, setDestination] = useState();
   const [fields, setFields] = useState();
@@ -18,18 +21,35 @@ const CreatePin = ({ user }) => {
   const [imageAsset, setImageAsset] = useState();
   const [wrongImageType, setWrongImageType] = useState(false);
   // This step just to build a backend system
-  const [selectedImage,setSelectedImage] = useState()
+  const [selectedImage, setSelectedImage] = useState();
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) navigate("/login");
+  }, []);
+
   const uploadImage = (e) => {
+    const form = new FormData();
     const selectedFile = e.target.files[0];
     // uploading asset to sanity
-    if (selectedFile.type === 'image/png' || selectedFile.type === 'image/svg' || selectedFile.type === 'image/jpeg' || selectedFile.type === 'image/gif' || selectedFile.type === 'image/tiff') {
+    if (
+      selectedFile.type === "image/png" ||
+      selectedFile.type === "image/svg" ||
+      selectedFile.type === "image/jpeg" ||
+      selectedFile.type === "image/gif" ||
+      selectedFile.type === "image/tiff"
+    ) {
       setWrongImageType(false);
       setLoading(true);
+      form.append("image", selectedFile);
       // my notes
-      setSelectedImage(selectedFile)
+      axios.post("http://127.0.0.1:8000/api/upload", form).then((response) => {
+        setImageAsset(true);
+        setSelectedImage(response.data.imagePath);
+        setLoading(false);
+      });
       // client.assets
       //   .upload('image', selectedFile, { contentType: selectedFile.type, filename: selectedFile.name })
       //   .then((document) => {
@@ -39,6 +59,8 @@ const CreatePin = ({ user }) => {
       //   .catch((error) => {
       //     console.log('Upload failed:', error.message);
       //   });
+      // setImageAsset(selectedFile.name);
+      // setLoading(false);
       // I dont need sanity I will create a backend system
     } else {
       setLoading(false);
@@ -47,56 +69,67 @@ const CreatePin = ({ user }) => {
   };
 
   const savePin = () => {
-    // if (title && about && destination && imageAsset?._id && category) {
-    //   const doc = {
-    //     _type: 'pin',
-    //     title,
-    //     about,
-    //     destination,
-    //     image: {
-    //       _type: 'image',
-    //       asset: {
-    //         _type: 'reference',
-    //         _ref: imageAsset?._id,
-    //       },
-    //     },
-    //     userId: user._id,
-    //     postedBy: {
-    //       _type: 'postedBy',
-    //       _ref: user._id,
-    //     },
-    //     category,
-    //   };
-    //   // client.create(doc).then(() => {
-    //   //   navigate('/');
-    //   // });
-    // } else {
-    //   setFields(true);
-
-    //   setTimeout(
-    //     () => {
-    //       setFields(false);
-    //     },
-    //     2000,
-    //   );
-    // }
+    const form = new FormData();
+    if (title && about && destination && selectedImage && category) {
+      form.append("title", title);
+      form.append("about", about);
+      form.append("destination", destination);
+      form.append("category_id", category);
+      form.append("image", selectedImage);
+      const token = localStorage.getItem("token");
+      form.append("token", token);
+      axios
+        .post("http://127.0.0.1:8000/api/create/pin", form)
+        .then((response) => {
+          swal({
+            title: "Well Done !",
+            text: response.data.message,
+            icon: "success",
+          });
+          navigate("/");
+        });
+      console.log(title, about, category);
+      // const doc = {
+      //   _type: "pin",
+      //   title,
+      //   about,
+      //   destination,
+      //   image: {
+      //     _type: "image",
+      //     asset: {
+      //       _type: "reference",
+      //       _ref: imageAsset?._id,
+      //     },
+      //   },
+      //   userId: user._id,
+      //   postedBy: {
+      //     _type: "postedBy",
+      //     _ref: user._id,
+      //   },
+      //   category,
+      // };
+      // client.create(doc).then(() => {
+      //   navigate('/');
+      // });
+    } else {
+      setFields(true);
+      setTimeout(() => {
+        setFields(false);
+      }, 2000);
+    }
   };
   return (
     <div className="flex flex-col justify-center items-center mt-5 lg:h-4/5">
       {fields && (
-        <p className="text-red-500 mb-5 text-xl transition-all duration-150 ease-in ">Please add all fields.</p>
+        <p className="text-red-500 mb-5 text-xl transition-all duration-150 ease-in ">
+          Please add all fields.
+        </p>
       )}
       <div className=" flex lg:flex-row flex-col justify-center items-center bg-white lg:p-5 p-3 lg:w-4/5  w-full">
         <div className="bg-secondaryColor p-3 flex flex-0.7 w-full">
           <div className=" flex justify-center items-center flex-col border-2 border-dotted border-gray-300 p-3 w-full h-420">
-            {loading && (
-              <Spinner />
-            )}
-            {
-              wrongImageType && (
-                <p>It&apos;s wrong file type.</p>
-              )
-            }
+            {loading && <Spinner />}
+            {wrongImageType && <p>It&apos;s wrong file type.</p>}
             {!imageAsset ? (
               // eslint-disable-next-line jsx-a11y/label-has-associated-control
               <label>
@@ -109,7 +142,8 @@ const CreatePin = ({ user }) => {
                   </div>
 
                   <p className="mt-32 text-gray-400">
-                    Recommendation: Use high-quality JPG, JPEG, SVG, PNG, GIF or TIFF less than 20MB
+                    Recommendation: Use high-quality JPG, JPEG, SVG, PNG, GIF or
+                    TIFF less than 20MB
                   </p>
                 </div>
                 <input
@@ -122,7 +156,7 @@ const CreatePin = ({ user }) => {
             ) : (
               <div className="relative h-full">
                 <img
-                  src={selectedImage}
+                  src={`../pins/${selectedImage}`}
                   alt="uploaded-pic"
                   className="h-full w-full"
                 />
@@ -149,11 +183,15 @@ const CreatePin = ({ user }) => {
           {user && (
             <div className="flex gap-2 mt-2 mb-2 items-center bg-white rounded-lg ">
               <img
-                src={useImage}
+                src={
+                  user?.image.startsWith("http")
+                    ? user?.image
+                    : `../users/${user?.image}`
+                }
                 className="w-10 h-10 rounded-full"
                 alt="user-profile"
               />
-              <p className="font-bold">Jafer Al-Dakhily</p>
+              <p className="font-bold">{user?.username}</p>
             </div>
           )}
           <input
@@ -173,16 +211,24 @@ const CreatePin = ({ user }) => {
 
           <div className="flex flex-col">
             <div>
-              <p className="mb-2 font-semibold text:lg sm:text-xl">Choose Pin Category</p>
+              <p className="mb-2 font-semibold text:lg sm:text-xl">
+                Choose Pin Category
+              </p>
               <select
                 onChange={(e) => {
                   setCategory(e.target.value);
                 }}
                 className="outline-none w-4/5 text-base border-b-2 border-gray-200 p-2 rounded-md cursor-pointer"
               >
-                <option value="others" className="sm:text-bg bg-white">Select Category</option>
-                {categories.map((item,index) => (
-                  <option key={index} className="text-base border-0 outline-none capitalize bg-white text-black " value={item.name}>
+                <option value="others" className="sm:text-bg bg-white">
+                  Select Category
+                </option>
+                {categories.map((item, index) => (
+                  <option
+                    key={index}
+                    className="text-base border-0 outline-none capitalize bg-white text-black "
+                    value={item.id}
+                  >
                     {item.name}
                   </option>
                 ))}

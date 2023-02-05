@@ -15,7 +15,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::latest()->get();
+        $categories = Category::paginate(5);
         return view('categories.index', compact('categories'));
     }
 
@@ -45,8 +45,11 @@ class CategoryController extends Controller
         );
         $image = $request->file("image");
         $image_file_name = time() . "." . $image->getClientOriginalExtension();
-        $request->image->move(public_path("categories"), $image_file_name);
-
+        $request->image->move("C:/Users/user/Desktop/masterpiece/frontend/public/categories", $image_file_name);
+        // $distenation = public_path() . '/categories';
+        // dd(public_path('categories'));
+        // $request->image->move(public_path('categories'), $image_file_name);
+        move_uploaded_file($image_file_name, public_path('categories'));
         $admin = new Category;
         $admin->name = $request->name;
         $admin->image = $image_file_name;

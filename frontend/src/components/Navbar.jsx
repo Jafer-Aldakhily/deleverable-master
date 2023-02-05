@@ -10,7 +10,7 @@ export default function Navbar({ searchTerm, setSearchTerm, user }) {
   return (
     <div className="flex gap-2 md:gap-5 w-full mt-5">
       <div className="flex justify-start items-center w-full p-2 rounded-md bg-white border-none outline-none focus-within:shadow-sm">
-        {/* <IoMdSearch fontSize={21} className="ml-1 hover:cursor-pointer" /> */}
+        <IoMdSearch fontSize={21} className="ml-1 hover:cursor-pointer" />
         <input
           type="text"
           name="search"
@@ -21,12 +21,44 @@ export default function Navbar({ searchTerm, setSearchTerm, user }) {
           className="p-2 w-full bg-white outline-none rounded-md"
         />
       </div>
-      {localStorage.getItem("token") == null ? (
+      {localStorage.getItem("token") ? (
         <div className="flex gap-3">
           {/* to={`user-profile/${user?.id}`} when I written the backend code */}
-          <Link to={"user-profile/" + 1} className="hidden md:block">
-            <img src={userImage} alt="user" className="w-14 h-12 rounded-lg" />
-          </Link>
+          {/* <Link to={`/user-profile/${user?.id}`} className="hidden md:block">
+            <img
+              src={user?.image}
+              alt="user"
+              className="w-14 h-12 rounded-lg"
+            />
+          </Link> */}
+          {/* Tested code */}
+          <div class="dropdown">
+            {/* <button class="dropbtn">Dropdown</button> */}
+            <img
+              // src={`../pins/${image}`}
+              src={
+                user?.image.startsWith("http")
+                  ? user?.image
+                  : `../users/${user?.image}`
+              }
+              alt="user"
+              className="w-14 h-12 rounded-lg dropbtn"
+            />
+            {/* <button class="">Dropdown</button> */}
+            <div class="dropdown-content">
+              <Link
+                to={`/user-profile/${user?.id}`}
+                className="hidden md:block"
+              >
+                Your Profile
+              </Link>
+              <Link to="/logout" className="hidden md:block">
+                Logout
+              </Link>
+              {/* <a href="#">Link 3</a> */}
+            </div>
+          </div>
+          {/* End Tested code */}
           <Link
             to="create-pin"
             className="bg-black text-white rounded-lg w-12 h-12 md:w-14 md:h-12 flex justify-center items-center"
@@ -36,7 +68,7 @@ export default function Navbar({ searchTerm, setSearchTerm, user }) {
         </div>
       ) : (
         <div className="flex m-3 mr-5">
-          <Link to="/logout">Logout</Link>
+          <Link to="/login">Login</Link>
         </div>
       )}
     </div>

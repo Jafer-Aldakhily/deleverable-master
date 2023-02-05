@@ -5,6 +5,8 @@ import './index.css';
 import { BrowserRouter as Router } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import './assets/css/dropdown.css'
+import 'font-awesome/css/font-awesome.min.css';
 
 // client_id = 349496532252-j24sr9vmftp6nb246460c7crqd6l1lb8.apps.googleusercontent.com
 // client_secret = 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

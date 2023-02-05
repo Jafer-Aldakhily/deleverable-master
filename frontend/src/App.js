@@ -5,7 +5,7 @@ import SignUp from './components/SignUp'
 import Home from './container/Home'
 import axios from 'axios'
 // To setup axios with laravel snactum
-axios.defaults.baseURL = "http://localhost:8000";
+axios.defaults.baseURL = "http://localhost:8000/";
 axios.defaults.headers.post["Content-Type"] = "application/vnd.api+json";
 axios.defaults.headers.post["Accept"] = "application/vnd.api+json";
 axios.defaults.withCredentials = true;

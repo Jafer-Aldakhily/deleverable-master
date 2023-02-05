@@ -1,51 +1,95 @@
-import React, { useEffect, useState } from 'react';
-import { AiOutlineLogout } from 'react-icons/ai';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { AiOutlineLogout } from "react-icons/ai";
+import { useParams, useNavigate, Link } from "react-router-dom";
 // import { GoogleLogout } from 'react-google-login';
 
-import MasonryLayout from './MasonryLayout';
-import Spinner from './Spinner';
-import usersData from '../utils/data3'
-import images from '../utils/data2'
+import MasonryLayout from "./MasonryLayout";
+import Spinner from "./Spinner";
+import usersData from "../utils/data3";
+import images from "../utils/data2";
+import axios from "axios";
+// user demo image
+import uImg from "../assets/0018.jpg";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const activeBtnStyles = 'bg-red-500 text-white font-bold p-2 rounded-full w-20 outline-none';
-const notActiveBtnStyles = 'bg-primary mr-4 text-black font-bold p-2 rounded-full w-20 outline-none';
+const activeBtnStyles =
+  "bg-red-500 text-white font-bold p-2 rounded-full w-20 outline-none";
+const notActiveBtnStyles =
+  "bg-primary mr-4 text-black font-bold p-2 rounded-full w-20 outline-none";
 
-const UserProfile = () => {
+const UserProfile = ({ authUser }) => {
   const [user, setUser] = useState();
   const [pins, setPins] = useState();
-  const [text, setText] = useState('Created');
-  const [activeBtn, setActiveBtn] = useState('created');
+  const [createdPins, setCreatedPins] = useState();
+  const [savedPins, setSavedPins] = useState();
+  const [text, setText] = useState("Created");
+  const [activeBtn, setActiveBtn] = useState("created");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { userId } = useParams();
-  // import 
 
-  const User = localStorage.getItem('user') !== 'undefined' ? JSON.parse(localStorage.getItem('user')) : localStorage.clear();
+  // useEffect(() => {
+  //   axios
+  //     .post("http://127.0.0.1:8000/api/user/profile/" + userId)
+  //     .then((response) => {
+  //       setUser(response.data.user);
+  //       setcreatedPins(response.data.user_pins);
+  //       setPins(response.data.user_pins);
+  //       setSavedPins(response.data.user_saved_pins);
+  //     });
+  // }, []);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) navigate("/login");
+    // const form = new FormData();
+    // form.append("id", userId);
+    axios
+      .post("http://127.0.0.1:8000/api/user/profile/" + userId)
+      .then((response) => {
+        setUser(response.data.user);
+        setCreatedPins(response.data.user_pins);
+        setSavedPins(response.data.user_saved_pins);
+        setPins(response.data.user_pins);
+      });
     // console.log(userId);
-    const result = usersData.filter(user => user.id == userId)
-    setUser(result[0])
-    console.log(user?.image);
-  }, [userId]);
+    // const result = usersData.filter((user) => user.id == userId);
+    // setUser(result[0]);
+    // console.log(user);
+  }, []);
+
+  const setPinsCreated = () => {
+    setTimeout(() => {
+      setPins(createdPins);
+      setLoading(false);
+    }, 100);
+  };
+
+  const setPinsSaved = () => {
+    setTimeout(() => {
+      setPins(savedPins);
+      setLoading(false);
+    }, 100);
+  };
 
   useEffect(() => {
-    if (text === 'Created') {
-      const result = images.filter(img => img.create == user?.name)
-      setPins(result)
+    if (text === "Created") {
+      setLoading(true);
+      setPinsCreated();
     } else {
-      const result = images.filter(img => img.save == user?.name)
-      setPins(result)
+      setLoading(true);
+      setPinsSaved();
     }
   }, [text, userId]);
 
   const logout = () => {
     localStorage.clear();
-
-    navigate('/login');
+    navigate("/login");
   };
 
   if (!user) return <Spinner message="Loading profile" />;
+
+  if (loading) return <Spinner message="Loading pins..." />;
 
   return (
     <div className="relative pb-2 h-full justify-center items-center">
@@ -59,14 +103,36 @@ const UserProfile = () => {
             />
             <img
               className="rounded-full w-20 h-20 -mt-10 shadow-xl object-cover"
-              src={user.image}
+              src={
+                user?.image.startsWith("http")
+                  ? user?.image
+                  : `../users/${user?.image}`
+              }
               alt="user-pic"
             />
           </div>
           <h1 className="font-bold text-3xl text-center mt-3">
-            {user.userName}
+            {user?.username}
           </h1>
+          <p className="font-bold  text-center mt-3">{user?.phone_number}</p>
+          {parseInt(userId) === authUser?.id ? (
+            <>
+              <div className="absolute top-0 z-1 right-0 p-2">
+                <Link
+                  type="button"
+                  to={`edit/profile/${authUser?.id}`}
+                  className={`bg-primary mr-4 text-2xl text-white font-bold p-2 rounded-full w-20 outline-none`}
+                >
+                  {/* <FontAwesomeIcon icon="fa-solid fa-pen-to-square" /> */}
+                  <i className="fa-solid fa-pen-to-square"></i>
+                </Link>
+              </div>
+            </>
+          ) : (
+            ""
+          )}
           {/* <div className="absolute top-0 z-1 right-0 p-2">
+
             {userId === User.googleId && (
               <GoogleLogout
                 clientId={`${process.env.REACT_APP_GOOGLE_API_TOKEN}`}
@@ -91,9 +157,11 @@ const UserProfile = () => {
             type="button"
             onClick={(e) => {
               setText(e.target.textContent);
-              setActiveBtn('created');
+              setActiveBtn("created");
             }}
-            className={`${activeBtn === 'created' ? activeBtnStyles : notActiveBtnStyles}`}
+            className={`${
+              activeBtn === "created" ? activeBtnStyles : notActiveBtnStyles
+            }`}
           >
             Created
           </button>
@@ -101,25 +169,28 @@ const UserProfile = () => {
             type="button"
             onClick={(e) => {
               setText(e.target.textContent);
-              setActiveBtn('saved');
+              setActiveBtn("saved");
             }}
-            className={`${activeBtn === 'saved' ? activeBtnStyles : notActiveBtnStyles}`}
+            className={`${
+              activeBtn === "saved" ? activeBtnStyles : notActiveBtnStyles
+            }`}
           >
             Saved
           </button>
         </div>
 
-        <div className="px-2">
-          <MasonryLayout pins={pins} />
-        </div>
+        {pins?.length > 0 && (
+          <div className="px-2">
+            <MasonryLayout pins={pins} />
+          </div>
+        )}
 
         {pins?.length === 0 && (
-        <div className="flex justify-center font-bold items-center w-full text-1xl mt-2">
-          No Pins Found!
-        </div>
+          <div className="flex justify-center font-bold items-center w-full text-1xl mt-2">
+            No Pins Found!
+          </div>
         )}
       </div>
-
     </div>
   );
 };

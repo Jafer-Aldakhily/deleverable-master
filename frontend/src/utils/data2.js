@@ -5,9 +5,9 @@ const images = [
       about: 'fashion',
       destination:"https://i.picsum.photos/id/21/3008/2008.jpg?hmac=T8DSVNvP-QldCew7WD4jj_S3mWwxZPqdF0CNPksSko4",
       category_id:1,
-      posted_by:"Mohammed", // I will convert it to the value of user_id but in the future
-      save : "Mohammed",
-      create:"Mohammed",
+      posted_by:"Jafer", // I will convert it to the value of user_id but in the future
+      save : "Jafer",
+      create:"jafer Aldkly",
       image: 'https://i.picsum.photos/id/21/3008/2008.jpg?hmac=T8DSVNvP-QldCew7WD4jj_S3mWwxZPqdF0CNPksSko4',
     },
     {

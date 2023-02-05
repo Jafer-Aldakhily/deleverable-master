@@ -52,14 +52,14 @@ export default function SignUp() {
 
       <div className="absolute flex flex-col justify-center items-center top-0 right-0 left-0 bottom-0 bg-blackOverlay">
         <div className="">
-          <div className="p-5">
+          <div className="p-1">
             <img src={logo} width="130px" alt="logo" />
           </div>
 
           <div className="pb-5 flex flex-col justify-center items-start">
             {/* firstname */}
             <div className="mb-2  text-white ">
-              <Label htmlFor="email4" value="first name" />
+              {/* <Label htmlFor="email4" value="first name" /> */}
             </div>
             <TextInput
               id="first_name"
@@ -72,7 +72,7 @@ export default function SignUp() {
             />
             {/* lastname */}
             <div className="mb-2  text-white ">
-              <Label htmlFor="email4" value="last name" />
+              {/* <Label htmlFor="email4" value="last name" /> */}
             </div>
             <TextInput
               id="last_name"
@@ -85,7 +85,7 @@ export default function SignUp() {
             />
             {/* username */}
             <div className="mb-2  text-white ">
-              <Label htmlFor="email4" value="username" />
+              {/* <Label htmlFor="email4" value="username" /> */}
             </div>
             <TextInput
               id="username"
@@ -99,7 +99,7 @@ export default function SignUp() {
 
             {/* phone number */}
             <div className="mb-2  text-white ">
-              <Label htmlFor="phone" value="phone" />
+              {/* <Label htmlFor="phone" value="phone" /> */}
             </div>
             <TextInput
               id="phone"
@@ -112,7 +112,7 @@ export default function SignUp() {
             />
             {/* email */}
             <div className="mb-2  text-white ">
-              <Label htmlFor="email4" value="email" />
+              {/* <Label htmlFor="email4" value="email" /> */}
             </div>
             <TextInput
               id="email4"
@@ -125,7 +125,7 @@ export default function SignUp() {
             />
             {/* password */}
             <div className="mb-2  text-white">
-              <Label htmlFor="password" value="password" />
+              {/* <Label htmlFor="password" value="password" /> */}
             </div>
             <TextInput
               id="password"
@@ -137,7 +137,7 @@ export default function SignUp() {
             />
             {/* confirm password */}
             <div className="mb-2  text-white">
-              <Label htmlFor="confirm password" value="confirm password" />
+              {/* <Label htmlFor="confirm password" value="confirm password" /> */}
             </div>
             <TextInput
               id="password_confirmation"

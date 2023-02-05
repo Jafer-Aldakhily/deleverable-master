@@ -19,9 +19,8 @@ return new class extends Migration
             $table->string("about");
             $table->string("destination");
             $table->foreignId("category_id")->constrained("categories");
-            $table->string("posted_by");
-            $table->string("save");
-            $table->string("create");
+            $table->string("user_id");
+            $table->string("number_of_saved")->default(0);
             $table->string("image"); // yet for now just
             $table->timestamps();
         });

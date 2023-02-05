@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
             "first_name" => "Jafer",
             "last_name" => "al-dakhily",
             "email" => "Jafer@mail.com",
-            "password" => Hash::make(12345678),
+            "password" => bcrypt(12345678),
             "admin_image" => "https://tse2.mm.bing.net/th?id=OIP.zs9g3emlEhLN16b1z5_CzwHaHa&pid=Api&P=0",
             "admin_type" => "super_admin",
         ]);

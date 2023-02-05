@@ -23,35 +23,40 @@ class AdminProfileController extends Controller
             "email" => "required|email"
         ]);
 
-        Admin::where('id', '=', Auth::guard("admin")->user()->id)->update([
+        Admin::where('id', '=', $request->admin_id)->update([
             "first_name" => $request->first_name,
             "last_name" => $request->last_name,
             "email" => $request->email,
         ]);
 
-        return redirect()->route('adminProfile');
+        // return redirect()->route('adminProfile')->with("success", "Profile updated successfully");
+        return view("users.profile")->with("success", "Profile updated successfully");
     }
 
     public function updatePassword(Request $request)
     {
 
-        $request->validate(
-            [
-                'password_current'      => 'required',
-                'password_new'          => 'required|regex:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/|required_with:password_confirmation|same:password_confirmation',
-                'password_confirmation' => 'required'
-            ],
-            [
-                'password_new.regex' => 'The password should have minimum eight characters,
-        at least one letter, one number and one special character'
-            ]
-        );
+        // $request->validate(
+        //     [
+        //         'password_current'      => 'required',
+        //         'password_new'          => 'required|regex:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/|required_with:password_confirmation|same:password_confirmation',
+        //         'password_confirmation' => 'required'
+        //     ],
+        //     [
+        //         'password_new.regex' => 'The password should have minimum eight characters,
+        // at least one letter, one number and one special character'
+        //     ]
+        // );
 
-        $admin = Admin::findOrFail(auth()->guard("admin")->user()->id);
+        // dd($request->all());
+
+        $admin = Admin::findOrFail($request->admin_id);
+        // dd($admin);
         $check = Hash::check($request->password_current, $admin->password);
+        // dd($check);
         if ($check) {
             $admin->password = Hash::make($request->password_new);
-            $admin->save();
+            $admin->update();
             return back();
         }
     }
@@ -64,7 +69,7 @@ class AdminProfileController extends Controller
         ]);
 
 
-        $admin = Admin::findOrFail(auth()->guard("admin")->user()->id);
+        $admin = Admin::findOrFail($request->admin_id);
 
         // Variable to check
         $url = $admin->admin_image;

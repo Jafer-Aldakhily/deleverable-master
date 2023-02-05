@@ -1,24 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { MdDownloadForOffline } from 'react-icons/md';
-import { Link, useParams } from 'react-router-dom';
-import MasonryLayout from './MasonryLayout';
-import { pinDetailMorePinQuery, pinDetailQuery } from '../utils/data';
-import Spinner from './Spinner';
-import images from '../utils/data2'
-
+import React, { useEffect, useState } from "react";
+import { MdDownloadForOffline } from "react-icons/md";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import MasonryLayout from "./MasonryLayout";
+import { pinDetailMorePinQuery, pinDetailQuery } from "../utils/data";
+import Spinner from "./Spinner";
+import images from "../utils/data2";
+import axios from "axios";
 const PinDetail = ({ user }) => {
   const { pinId } = useParams();
-  const [pins, setPins] = useState(images);
+  const [pins, setPins] = useState();
   const [pinDetail, setPinDetail] = useState();
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
+  // const [comments, setComments] = useState("");
   const [addingComment, setAddingComment] = useState(false);
-
+  const navigate = useNavigate();
   const fetchPinDetails = () => {
-      const result = pins?.filter(item => item.id == pinId)
-      // console.log(result[0]);
-      setPinDetail(result[0])   
-      console.log(pinDetail); 
+    const token = localStorage.getItem("token");
+    if (!token) navigate("/login");
+    const result = axios.get("/api/find/pin/" + pinId).then((response) => {
+      setPinDetail(response.data.pin);
+      setPins(response.data.pins);
+      // setComments(response.data.comments);
+      console.log(response.data.pin);
+    });
+    // const result = pins?.filter((item) => item.id == pinId);
+    // console.log(result[0]);
+    // setPinDetail(result[0]);
+    // console.log(pinDetail);
   };
+
+  // const fetchPins = () => {
+  //   const result = axios.get("/api/all/pins").then((response) => {
+  //     setPins(response.data.pins);
+  //   });
+  // };
 
   useEffect(() => {
     fetchPinDetails();
@@ -27,7 +42,21 @@ const PinDetail = ({ user }) => {
   const addComment = () => {
     if (comment) {
       setAddingComment(true);
-
+      // const form = new FormData();
+      // form.append('token', localStorage.getItem('token'))
+      const token = localStorage.getItem("token");
+      const data = {
+        comment: comment,
+        pin_id: pinId,
+        token: token,
+      };
+      axios
+        .post("http://127.0.0.1:8000/api/create/comment", data)
+        .then((response) => {
+          fetchPinDetails();
+          setComment("");
+          setAddingComment(false);
+        });
       // client
       //   .patch(pinId)
       //   .setIfMissing({ comments: [] })
@@ -42,32 +71,33 @@ const PinDetail = ({ user }) => {
   };
 
   if (!pinDetail) {
-    return (
-      <Spinner message="Showing pin" />
-    );
+    return <Spinner message="Showing pin" />;
   }
 
   return (
     <>
       {pinDetail && (
-        <div className="flex xl:flex-row flex-col m-auto bg-white" style={{ maxWidth: '1500px', borderRadius: '32px' }}>
+        <div
+          className="flex xl:flex-row flex-col m-auto bg-white"
+          style={{ maxWidth: "1500px", borderRadius: "32px" }}
+        >
           <div className="flex justify-center items-center md:items-start flex-initial">
             <img
               className="rounded-t-3xl rounded-b-lg"
-              src={pinDetail.image}
+              src={`../pins/${pinDetail.image}`}
               alt="user-post"
             />
           </div>
           <div className="w-full p-5 flex-1 xl:min-w-620">
             <div className="flex items-center justify-between">
               <div className="flex gap-2 items-center">
-                {/* <a
-                  href={`${pinDetail.image.asset.url}?dl=`}
+                <a
+                  href={`${pinDetail.destination}?dl=`}
                   download
                   className="bg-secondaryColor p-2 text-xl rounded-full flex items-center justify-center text-dark opacity-75 hover:opacity-100"
                 >
                   <MdDownloadForOffline />
-                </a> */}
+                </a>
               </div>
               <a href={pinDetail.destination} target="_blank" rel="noreferrer">
                 {pinDetail.destination?.slice(8)}
@@ -79,32 +109,44 @@ const PinDetail = ({ user }) => {
               </h1>
               <p className="mt-3">{pinDetail.about}</p>
             </div>
-            {/* <Link to={`/user-profile/${pinDetail?.postedBy._id}`} className="flex gap-2 mt-5 items-center bg-white rounded-lg ">
-              <img src={pinDetail?.postedBy.image} className="w-10 h-10 rounded-full" alt="user-profile" />
+            {/* <Link
+              to={`/user-profile/${pinDetail?.postedBy._id}`}
+              className="flex gap-2 mt-5 items-center bg-white rounded-lg "
+            >
+              <img
+                src={pinDetail?.postedBy.image}
+                className="w-10 h-10 rounded-full"
+                alt="user-profile"
+              />
               <p className="font-bold">{pinDetail?.postedBy.userName}</p>
             </Link> */}
             <h2 className="mt-5 text-2xl">Comments</h2>
             <div className="max-h-370 overflow-y-auto">
-              {
-              // pinDetail?.comments?.map((item) => (
-              //   <div className="flex gap-2 mt-5 items-center bg-white rounded-lg" key={item.comment}>
-              //     <img
-              //       src={item.postedBy?.image}
-              //       className="w-10 h-10 rounded-full cursor-pointer"
-              //       alt="user-profile"
-              //     />
-              //     <div className="flex flex-col">
-              //       <p className="font-bold">{item.postedBy?.userName}</p>
-              //       <p>{item.comment}</p>
-              //     </div>
-              //   </div>
-              // ))
-              }
+              {pinDetail?.comments?.map((item) => (
+                <div
+                  className="flex gap-2 mt-5 items-center bg-white rounded-lg"
+                  key={item.comment}
+                >
+                  <img
+                    src={item?.user?.image}
+                    className="w-10 h-10 rounded-full cursor-pointer"
+                    alt="user-profile"
+                  />
+                  <div className="flex flex-col">
+                    <p className="font-bold">{item?.user?.userName}</p>
+                    <p>{item?.comment}</p>
+                  </div>
+                </div>
+              ))}
             </div>
             <div className="flex flex-wrap mt-6 gap-3">
-              {/* <Link to={`/user-profile/${user.id}`}>
-                <img src={user.image} className="w-10 h-10 rounded-full cursor-pointer" alt="user-profile" />
-              </Link> */}
+              <Link to={`/user-profile/${user?.id}`}>
+                <img
+                  src={user?.image}
+                  className="w-10 h-10 rounded-full cursor-pointer"
+                  alt="user-profile"
+                />
+              </Link>
               <input
                 className=" flex-1 border-gray-100 outline-none border-2 p-2 rounded-2xl focus:border-gray-300"
                 type="text"
@@ -117,7 +159,7 @@ const PinDetail = ({ user }) => {
                 className="bg-red-500 text-white rounded-full px-6 py-2 font-semibold text-base outline-none"
                 onClick={addComment}
               >
-                {addingComment ? 'Doing...' : 'Done'}
+                {addingComment ? "Doing..." : "Done"}
               </button>
             </div>
           </div>

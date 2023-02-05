@@ -1,24 +1,49 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
-import { MdDownloadForOffline } from 'react-icons/md';
-import { AiTwotoneDelete } from 'react-icons/ai';
-import { BsFillArrowUpRightCircleFill } from 'react-icons/bs';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
+import { MdDownloadForOffline } from "react-icons/md";
+import { AiTwotoneDelete } from "react-icons/ai";
+import { BsFillArrowUpRightCircleFill } from "react-icons/bs";
+import { useEffect } from "react";
+import axios from "axios";
+import swal from "sweetalert";
+import Swal from "sweetalert2";
+// window.Swal = swal;
+
+// import users from "../utils/data3";
 
 // import { client, urlFor } from '../client';
 
-const Pin = ({ pin }) => {
+const Pin = ({ pin, authUser }) => {
   const [postHovered, setPostHovered] = useState(false);
   const [savingPost, setSavingPost] = useState(false);
 
   const navigate = useNavigate();
 
-  const { posted_by, image, id, destination } = pin;
-
-  const user = localStorage.getItem('user') !== 'undefined' ? JSON.parse(localStorage.getItem('user')) : localStorage.clear();
-
+  const { user, image, id, destination } = pin;
+  // console.log(pin);
   const deletePin = (id) => {
-    console.log(id);
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`http://127.0.0.1:8000/api/delete/pin/${id}`)
+          .then((response) => {
+            Swal.fire("Deleted!", response.data.message, "success");
+          })
+          .then(() => {
+            window.location.reload();
+          });
+      }
+    });
+    // /delete/pin/{id}
     // client
     //   .delete(id)
     //   .then(() => {
@@ -31,8 +56,18 @@ const Pin = ({ pin }) => {
   alreadySaved = alreadySaved?.length > 0 ? alreadySaved : [];
 
   const savePin = (id) => {
+    console.log(authUser);
     if (alreadySaved?.length === 0) {
       setSavingPost(true);
+      const data = {
+        user_id: authUser.id,
+        pin_id: id,
+      };
+      axios
+        .post("http://127.0.0.1:8000/api/save/pin", data)
+        .then((response) => {
+          setSavingPost(false);
+        });
     }
   };
 
@@ -44,28 +79,37 @@ const Pin = ({ pin }) => {
         onClick={() => navigate(`/pin-detail/${id}`)}
         className=" relative cursor-zoom-in w-auto hover:shadow-lg rounded-lg overflow-hidden transition-all duration-500 ease-in-out"
       >
-          {image && (
-        <img className="rounded-lg w-full " src={image} alt="user-post" /> )}
+        {image && (
+          <img
+            className="rounded-lg w-full "
+            src={`../pins/${image}`}
+            alt="user-post"
+          />
+        )}
         {postHovered && (
           <div
             className="absolute top-0 w-full h-full flex flex-col justify-between p-1 pr-2 pt-2 pb-2 z-50"
-            style={{ height: '100%' }}
+            style={{ height: "100%" }}
           >
             <div className="flex items-center justify-between">
               <div className="flex gap-2">
                 <a
-                  href={`${image?.asset?.url}?dl=`}
+                  href={`../pins/${image}`}
                   download
                   onClick={(e) => {
                     e.stopPropagation();
                   }}
                   className="bg-white w-9 h-9 p-2 rounded-full flex items-center justify-center text-dark text-xl opacity-75 hover:opacity-100 hover:shadow-md outline-none"
-                ><MdDownloadForOffline />
+                >
+                  <MdDownloadForOffline />
                 </a>
               </div>
               {alreadySaved?.length !== 0 ? (
-                <button type="button" className="bg-red-500 opacity-70 hover:opacity-100 text-white font-bold px-5 py-1 text-base rounded-3xl hover:shadow-md outline-none">
-                  {pin?.save?.length}  Saved
+                <button
+                  type="button"
+                  className="bg-red-500 opacity-70 hover:opacity-100 text-white font-bold px-5 py-1 text-base rounded-3xl hover:shadow-md outline-none"
+                >
+                  {pin?.save?.length} Saved
                 </button>
               ) : (
                 <button
@@ -76,7 +120,7 @@ const Pin = ({ pin }) => {
                   type="button"
                   className="bg-red-500 opacity-70 hover:opacity-100 text-white font-bold px-5 py-1 text-base rounded-3xl hover:shadow-md outline-none"
                 >
-                  {pin?.save?.length}   {savingPost ? 'Saving' : 'Save'}
+                  {pin?.save?.length} {savingPost ? "Saving" : "Save"}
                 </button>
               )}
             </div>
@@ -88,37 +132,46 @@ const Pin = ({ pin }) => {
                   className="bg-white flex items-center gap-2 text-black font-bold p-2 pl-4 pr-4 rounded-full opacity-70 hover:opacity-100 hover:shadow-md"
                   rel="noreferrer"
                 >
-                  {' '}
+                  {" "}
                   <BsFillArrowUpRightCircleFill />
                   {destination?.slice(8, 17)}...
                 </a>
               ) : undefined}
-              {/* {
-           posted_by?._id === user?.googleId && (
-           <button
-             type="button"
-             onClick={(e) => {
-               e.stopPropagation();
-               deletePin(id);
-             }}
-             className="bg-white p-2 rounded-full w-8 h-8 flex items-center justify-center text-dark opacity-75 hover:opacity-100 outline-none"
-           >
-             <AiTwotoneDelete />
-           </button>
-           )
-        } */}
+              {parseInt(pin?.user_id) === parseInt(authUser?.id) ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deletePin(id);
+                    }}
+                    className="bg-white p-2 rounded-full w-8 h-8 flex items-center justify-center text-dark opacity-75 hover:opacity-100 outline-none"
+                  >
+                    <AiTwotoneDelete />
+                  </button>
+                </>
+              ) : (
+                ""
+              )}
             </div>
           </div>
         )}
       </div>
       {/* <Link to={`/user-profile/${posted_by?._id}`} className="flex gap-2 mt-2 items-center"> */}
-      <Link to={`/user-profile`} className="flex gap-2 mt-2 items-center">
+      <Link
+        to={`/user-profile/${user?.id}`}
+        className="flex gap-2 mt-2 items-center"
+      >
         <img
           className="w-8 h-8 rounded-full object-cover"
-          src="https://picsum.photos/200/300?grayscale"
+          src={
+            user?.image.startsWith("http")
+              ? user?.image
+              : `../users/${user?.image}`
+          }
           alt="user-profile"
         />
-        <p className="font-semibold capitalize">Jafer Al-Dakhil</p>
+        <p className="font-semibold capitalize">{user?.username}</p>
       </Link>
     </div>
   );

@@ -25,8 +25,9 @@
                                     @if (Session::has('error'))
                                     <div class="my-2 bg-danger p-2 text-white rounded">{{ Session::get('error') }}</div>
                                     @endif
-                                    <form class="user" method="post" action="{{ route('adminLoginPost') }}" >
+                                    <form class="user" action="{{ route('adminLoginPost') }}" method="post">
                                         @csrf
+                                        {{-- <input type="hidden" name="_token" value={{ csrf_token() }}> --}}
                                         <div class="form-group">
                                             <input type="email" class="form-control form-control-user"
                                                 id="exampleInputEmail" aria-describedby="emailHelp"
@@ -40,13 +41,6 @@
                                                 name="password"
                                                 >
                                         </div>
-                                        <div class="form-group">
-                                            <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck">
-                                                <label class="custom-control-label" for="customCheck">Remember
-                                                    Me</label>
-                                            </div>
-                                        </div>
                                         <button type="submit" class="btn btn-primary btn-user btn-block">
                                             Login
                                         </button>
@@ -55,9 +49,6 @@
                                     <hr>
                                     <div class="text-center">
                                         <a class="small" href="forgot-password.html">Forgot Password?</a>
-                                    </div>
-                                    <div class="text-center">
-                                        <a class="small" href="/register">Create an Account!</a>
                                     </div>
                                 </div>
                             </div>
